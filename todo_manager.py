@@ -25,18 +25,11 @@ class TaskManager:
         self.load()
 
     def find_task(self):
-        if not self.tasks:
-            print("Список задач пуст.")
-            return
-        try:
-            task_id = int(input("Введите номер задачи: "))
-        except ValueError:
-            print("Нужно ввести число!")
-            return
-        for task in self.tasks:
-            if task['id'] == task_id:
-                return task
-        return print("Задача не найдена.")
+        def find_task(self, task_id):
+            for task in self.tasks:
+                if task.id == task_id:
+                    return task
+            return None
 
     def add(self, title):
         # TODO: создать задачу, добавить, сохранить
