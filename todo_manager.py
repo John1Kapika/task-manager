@@ -1,113 +1,46 @@
 import json
-numberTask = None
-nextID = int(0)
-listTask = []
 
-def main():
-    global listTask, nextID
-    listTask = load_tasks()
-    # Восстанавливаем счётчик
-    if listTask:
-        max_id = max(task['id'] for task in listTask)
-        nextID = max_id
-    else:
-        nextID = 0
-    print(f"Загружено {len(listTask)} задач.")
-    while True:
+class Task:
+    def __init__(self, task_id, title, done=False):
+        self.id = task_id
+        self.title = title
+        self.done = done
+
+    def mark_done(self):
+        # Меняет статус задачи
+        self.done = True
+
+    def to_dict(self):
+        # Превращает в словарь для JSON
+        return {"id": self.id, "title": self.title, "done": self.done}
+    @staticmethod
+    def from_dict(data):
+        # Создаёт задачу из словаря
+        return Task(data["id"], data["title"], data["done"])
+
+class TaskManager:
+    def __init__(self):
+        self.tasks = []
+        self.next_id = 1
+        self.load()
+
+    def find_task(self):
+        if not self.tasks:
+            print("Список задач пуст.")
+            return
         try:
-            numberTask = int(input(
-                  "------------------------------\n1. Добавить задачу\n2. Показать все задачи\n3. Отметить задачу выполненной\n4. Удалить задачу"
-                  "\n5. Выход\n\nНапишите номер действия: "))
-            print("------------------------------")
+            task_id = int(input("Введите номер задачи: "))
         except ValueError:
-            print("Пожалуйста, введите число.")
-            continue
-        if numberTask == 1:
-            new_task()
-        elif numberTask == 2:
-            all_task()
-        elif numberTask == 3:
-            yes_task()
-        elif numberTask == 4:
-            delete_task()
-        elif numberTask == 5:
-            exit()
-            break
-        else:
-            print("Неверный номер\n")
-
-def new_task():
-    global nextID, listTask
-    nextID = int(nextID + 1)
-    task = {'id': nextID, 'title': input("Опишите новую задачу: "), 'done': False}
-    listTask.append(task)
-    save_tasks(listTask)
-    print("Задача успешно добавлена.")
-
-def all_task():
-    if not listTask:
-        print("Список задач пуст.")
-        return
-    for idx, task in enumerate(listTask, start=1):
-        if task['done'] == False:
-            print(task['id'], ". [ ] ", task['title'], sep='')
-        else:
-            print(task['id'], ". [X] ", task['title'], sep='')
-
-def yes_task():
-    global listTask
-    if not listTask:
-        print("Список задач пуст.")
-        return
-    try:
-        task_id = int(input("Введите номер выполненной задачи: "))
-    except ValueError:
-        print("Нужно ввести число.")
-        return
-    for task in listTask:
-        if task['id'] == task_id:
-            if task['done']:
-                print("Уже выполнена.")
-            else:
-                task['done'] = True
-                save_tasks(listTask)
-                print("Выполнена!")
+            print("Нужно ввести число!")
             return
-    print("Задача не найдена.")
+        for task in self.tasks:
+            if task['id'] == task_id:
+                return task
+        return print("Задача не найдена.")
 
-def delete_task():
-    global listTask
-    if not listTask:
-        print("Список задач пуст.")
-        return
-    try:
-        task_id = int(input("Введите номер задачи, помечаемой на удаление: "))
-    except ValueError:
-        print("Нужно ввести число.")
-        return
-    for task in listTask:
-        if task['id'] == task_id:
-            listTask.remove(task)
-            save_tasks(listTask)
-            print("Задача удалена.")
-            return
-    print("Задача не найдена.")
+    def add(self, title):
+        # TODO: создать задачу, добавить, сохранить
 
-def exit():
-    print("С Вами было приятно иметь дело.\nУспешного завершения дел!")
+        pass
 
-def load_tasks():
-    try:
-        with open('tasks.json', 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []  # если файла нет — пустой список
-    except json.JSONDecodeError:
-        # Файл есть, но содержит невалидный JSON — возвращаем пустой список
-        # (можно также вывести предупреждение или переименовать старый файл)
-        print("Файл tasks.json повреждён. Будет создан новый список задач.")
-        return []
-
-def save_tasks(tasks):
-    with open('tasks.json', 'w', encoding='utf-8') as f:
-        json.dump(tasks, f, indent=2, ensure_ascii=False)
+    # TODO: методы delete, mark_done, load, save, get_all
