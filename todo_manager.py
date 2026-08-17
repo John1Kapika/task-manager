@@ -31,6 +31,10 @@ class TaskManager:
                     return task
             return None
 
+    def save(self):
+        with open('tasks.json', 'w', encoding='utf-8') as f:
+            json.dump([task.to_dict() for task in self.tasks], f, indent=2, ensure_ascii=False)
+
     def add(self, title):
         # TODO: создать задачу, добавить, сохранить
 
